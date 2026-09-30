@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+compose_file="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)/docker-compose.yaml"
+
+if command -v podman >/dev/null 2>&1 && podman compose version >/dev/null 2>&1; then
+    exec podman compose --file "$compose_file" "$@"
+elif command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+    exec docker compose --file "$compose_file" "$@"
+elif command -v podman-compose >/dev/null 2>&1; then
+    exec podman-compose --file "$compose_file" "$@"
+elif command -v docker-compose >/dev/null 2>&1; then
+    exec docker-compose --file "$compose_file" "$@"
+else
+    echo 'Install Podman Compose or Docker Compose to run the service containers.' >&2
+    exit 1
+fi

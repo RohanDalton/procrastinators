@@ -1,0 +1,118 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling>=1.27"]
+
+[project]
+name = "procrastinators"
+authors = [{ name = "Rohan B. Dalton", email = "rohan@rohandalton.io" }]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+dependencies = ["platformdirs>=4.2"]
+description = "Rate limiting for ETL libraries and pipelines"
+dynamic = ["version"]
+keywords = ["rate-limiting", "throttling", "etl", "asyncio"]
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+memcached = ["pymemcache>=4.0"]
+postgres = ["psycopg>=3.2"]
+redis = ["redis>=5.2"]
+valkey = ["redis>=5.2"]
+
+[project.urls]
+Homepage = "https://github.com/rohan/procrastinators"
+
+# Anchored with leading slashes: hatchling patterns are gitignore-style, so a bare
+# name would also match a nested directory of the same name.
+[tool.hatch.build.targets.sdist]
+exclude = ["/docs/build", "/docs/source/reference/generated"]
+include = [
+    "/src/procrastinators",
+    "/tests",
+    "/docs",
+    "/README.md",
+    "/DESIGN.md",
+    "/IMPLEMENTATION_PLAN.md",
+    "/goal.md",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/procrastinators"]
+
+[tool.hatch.version]
+path = "src/procrastinators/__version__.py"
+
+[tool.pixi.dependencies]
+platformdirs = ">=4.2"
+python = ">=3.11"
+
+[tool.pixi.environments]
+build = ["build"]
+dev = ["docs", "lint", "services", "test"]
+
+[tool.pixi.feature.build.dependencies]
+hatch = "*"
+
+[tool.pixi.feature.docs.dependencies]
+myst-parser = "*"
+sphinx = "*"
+sphinx_rtd_theme = "*"
+
+[tool.pixi.feature.lint.dependencies]
+pre-commit = "*"
+ruff = "*"
+ty = "*"
+
+[tool.pixi.feature.services.dependencies]
+psycopg = ">=3.2"
+pymemcache = ">=4.0"
+redis-py = ">=5.2"
+
+[tool.pixi.feature.test.dependencies]
+pytest = ">=8.2"
+hypothesis = ">=6.168.3,<7"
+
+[tool.pixi.pypi-dependencies]
+procrastinators = { path = ".", editable = true }
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64"]
+
+[tool.pytest.ini_options]
+addopts = ["-ra", "--strict-markers", "--strict-config", "-m", "not service"]
+markers = [
+    "service(name): integration test requiring the named external service (redis, redis-cluster, valkey, postgres, memcached); excluded from the default run",
+]
+minversion = "8.0"
+norecursedirs = ["build", "dist", ".*"]
+testpaths = ["tests"]
+
+[tool.ruff]
+extend-exclude = [".pixi", "*.md"]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+ignore = ["C408"]
+select = ["ANN", "B", "C4", "E", "F", "I", "PT", "PTH", "RUF", "SIM", "TID", "UP", "W"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "parents"
+
+[tool.ty.environment]
+python-version = "3.11"
+
+[tool.ty.src]
+include = ["src", "tests"]
+
+[tool.ty.terminal]
+error-on-warning = true

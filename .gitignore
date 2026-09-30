@@ -1,0 +1,8 @@
+*.py[cdo]
+__pycache__/
+
+docs/build
+
+*.swp
+
+.idea/

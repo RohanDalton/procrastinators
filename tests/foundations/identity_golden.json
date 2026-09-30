@@ -1,0 +1,180 @@
+{
+  "identity_encoding_version": 1,
+  "fingerprint_schema": 1,
+  "encoding": {
+    "scope": {
+      "vendor": "ankh",
+      "dataset": "orders"
+    },
+    "hex": "70726f6372617374696e61746f72732f6964656e746974792f7631004d323a53373a6461746173657453363a6f726465727353363a76656e646f7253343a616e6b68"
+  },
+  "keys": [
+    {
+      "scope": {
+        "vendor": "ankh",
+        "dataset": "orders"
+      },
+      "key": "k1-bd8da783d00a57e397e4d1973a1c5f99af8b3615e602ab8589516c67bc88614b"
+    },
+    {
+      "scope": {
+        "vendor": "ankh",
+        "account": "warehouse",
+        "endpoint": "/v2/orders"
+      },
+      "key": "k1-ee1e4f3c2093837cc827dcff143755d1e6a718dc725879854c1c1af2beff0f56"
+    },
+    {
+      "scope": {
+        "vendor": "klatch",
+        "region": "Ankh-Morpork ☃",
+        "shard": 7
+      },
+      "key": "k1-f0426e9b4f82c1c3518543459054b83222a4e0e3358a306ca94c8c20c184d9bb"
+    },
+    {
+      "scope": {
+        "vendor": "quirm",
+        "weights": [
+          1,
+          2.5,
+          -3
+        ],
+        "enabled": true,
+        "note": null
+      },
+      "key": "k1-990219c8e637808c7ab7d4b63f734222dedc13ff0b86a1060cafb4dca50bf1f7"
+    },
+    {
+      "scope": {
+        "vendor": "sto-lat",
+        "nested": {
+          "b": [
+            {
+              "z": 0.0
+            }
+          ],
+          "a": false
+        }
+      },
+      "key": "k1-b5bbe3498d995fb8728c71da1840ea27acff18a847bd893116f92219e31cae18"
+    },
+    {
+      "scope": {
+        "vendor": "ankh",
+        "credential_ref": "vault://ankh/orders"
+      },
+      "key": "k1-2903ed3e0894051d7b8527e0fd3ba11a10a4b23ccd5767de20b86d5926f176f1"
+    }
+  ],
+  "hmac_keys": [
+    {
+      "scope": {
+        "vendor": "ankh",
+        "dataset": "orders"
+      },
+      "secret_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "key": "k1h-3f9908ddea404b75218a9c73c18b8a1a641ce021ada8d29fafddc00d555c891d"
+    },
+    {
+      "scope": {
+        "vendor": "ankh",
+        "account": "warehouse",
+        "endpoint": "/v2/orders"
+      },
+      "secret_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "key": "k1h-f7649bcc3129b0cce47304c38903b7ac638e021e73207494f01fb4ec6ebd6980"
+    }
+  ],
+  "fingerprints": [
+    {
+      "policy": "FixedWindowPolicy",
+      "arguments": [
+        10,
+        1000000
+      ],
+      "keywords": {},
+      "fingerprint": "p1-3fee3021eac83efcc8cc4d6446259ea9a27dc8f7b17ce1b39718cea01fe1e435"
+    },
+    {
+      "policy": "FixedWindowPolicy",
+      "arguments": [
+        10,
+        1000000
+      ],
+      "keywords": {
+        "epoch_offset_us": 250000
+      },
+      "fingerprint": "p1-dc748569b3760253cd8ff6aee55976d4082090764c35665d3209cc99a00af3d8"
+    },
+    {
+      "policy": "SlidingLogPolicy",
+      "arguments": [
+        10,
+        1000000
+      ],
+      "keywords": {},
+      "fingerprint": "p1-7cc57ab82c1b78fb39c461739e6a270c82193044c3f1b8418032f706dd4cfc4f"
+    },
+    {
+      "policy": "SlidingLogPolicy",
+      "arguments": [
+        500,
+        60000000
+      ],
+      "keywords": {},
+      "fingerprint": "p1-961f67c9b8a2f4a0b9e60525b201ce94877e5473867f4bde25a7fefaa6a7a59a"
+    },
+    {
+      "policy": "SlidingCounterPolicy",
+      "arguments": [
+        10,
+        1000000
+      ],
+      "keywords": {},
+      "fingerprint": "p1-1de44d062766086acf2c86954e68755dd113db26411f8d80ff30490e8dadeb24"
+    },
+    {
+      "policy": "TokenBucketPolicy",
+      "arguments": [
+        10,
+        1,
+        100000
+      ],
+      "keywords": {},
+      "fingerprint": "p1-66985190303797485b6e75fc11e53056c48615af268d0c44ee58ea265d6cc92e"
+    },
+    {
+      "policy": "TokenBucketPolicy",
+      "arguments": [
+        10,
+        1,
+        100000
+      ],
+      "keywords": {
+        "initial_tokens": 0
+      },
+      "fingerprint": "p1-fecab161e31050ede7eff9b582e85969f4265e74e0154203d361c2b5e12e6ed3"
+    },
+    {
+      "policy": "LeakyBucketPolicy",
+      "arguments": [
+        10,
+        1000000
+      ],
+      "keywords": {},
+      "fingerprint": "p1-e41d265e2f1f3a9e383db3c69cd7142e167ee6955ea694d764433919a80359f2"
+    },
+    {
+      "policy": "LeakyBucketPolicy",
+      "arguments": [
+        10,
+        1000000
+      ],
+      "keywords": {
+        "burst_tolerance": 2
+      },
+      "fingerprint": "p1-72d8584465dc066ba7e7e758ffb64f366cac2cabbe0cece0395fca13628ead64"
+    }
+  ]
+}

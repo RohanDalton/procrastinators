@@ -1,0 +1,142 @@
+name: procrastinators
+
+x-cluster-node: &cluster-node
+  image: docker.io/library/redis:7.4
+  network_mode: host
+  command:
+    - sh
+    - -ec
+    - |
+      exec docker-entrypoint.sh redis-server \
+        --port "$$REDIS_PORT" \
+        --bind 127.0.0.1 \
+        --cluster-enabled yes \
+        --cluster-config-file /data/nodes.conf \
+        --cluster-announce-ip 127.0.0.1 \
+        --cluster-announce-port "$$REDIS_PORT" \
+        --maxmemory-policy noeviction \
+        --appendonly yes
+  healthcheck:
+    test: [CMD-SHELL, 'redis-cli -p "$$REDIS_PORT" ping | grep -q PONG']
+    interval: 2s
+    timeout: 2s
+    retries: 20
+
+services:
+  redis:
+    image: docker.io/library/redis:7.4
+    command: [redis-server, --maxmemory-policy, noeviction, --appendonly, 'yes']
+    ports:
+      - '127.0.0.1:${PROCRASTINATORS_REDIS_PORT:-16379}:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+
+  valkey:
+    image: docker.io/valkey/valkey:8
+    command: [valkey-server, --maxmemory-policy, noeviction, --appendonly, 'yes']
+    ports:
+      - '127.0.0.1:${PROCRASTINATORS_VALKEY_PORT:-16380}:6379'
+    volumes:
+      - valkey-data:/data
+    healthcheck:
+      test: [CMD, valkey-cli, ping]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+
+  postgres:
+    image: docker.io/library/postgres:17
+    environment:
+      POSTGRES_USER: procrastinators
+      POSTGRES_PASSWORD: procrastinators
+      POSTGRES_DB: procrastinators
+    ports:
+      - '127.0.0.1:${PROCRASTINATORS_POSTGRES_PORT:-15432}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 2s
+      timeout: 2s
+      retries: 20
+
+  memcached:
+    image: docker.io/library/memcached:1.6
+    ports:
+      - '127.0.0.1:${PROCRASTINATORS_MEMCACHED_PORT:-11311}:11211'
+
+  cluster-17000:
+    <<: *cluster-node
+    environment:
+      REDIS_PORT: '${PROCRASTINATORS_REDIS_CLUSTER_PORT_1:-17000}'
+    volumes:
+      - cluster-17000-data:/data
+
+  cluster-17001:
+    <<: *cluster-node
+    environment:
+      REDIS_PORT: '${PROCRASTINATORS_REDIS_CLUSTER_PORT_2:-17001}'
+    volumes:
+      - cluster-17001-data:/data
+
+  cluster-17002:
+    <<: *cluster-node
+    environment:
+      REDIS_PORT: '${PROCRASTINATORS_REDIS_CLUSTER_PORT_3:-17002}'
+    volumes:
+      - cluster-17002-data:/data
+
+  cluster-init:
+    image: docker.io/library/redis:7.4
+    network_mode: host
+    profiles: [setup]
+    environment:
+      CLUSTER_PORT_1: '${PROCRASTINATORS_REDIS_CLUSTER_PORT_1:-17000}'
+      CLUSTER_PORT_2: '${PROCRASTINATORS_REDIS_CLUSTER_PORT_2:-17001}'
+      CLUSTER_PORT_3: '${PROCRASTINATORS_REDIS_CLUSTER_PORT_3:-17002}'
+    depends_on:
+      redis:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      memcached:
+        condition: service_started
+      cluster-17000:
+        condition: service_healthy
+      cluster-17001:
+        condition: service_healthy
+      cluster-17002:
+        condition: service_healthy
+    command:
+      - sh
+      - -ec
+      - |
+        if ! redis-cli -p "$$CLUSTER_PORT_1" cluster info | grep -q '^cluster_slots_assigned:16384'; then
+          redis-cli --cluster create \
+            "127.0.0.1:$$CLUSTER_PORT_1" "127.0.0.1:$$CLUSTER_PORT_2" "127.0.0.1:$$CLUSTER_PORT_3" \
+            --cluster-replicas 0 --cluster-yes
+        fi
+        attempt=0
+        until redis-cli -p "$$CLUSTER_PORT_1" cluster info | grep -q '^cluster_state:ok'; do
+          attempt=$$((attempt + 1))
+          if [ "$$attempt" -ge 30 ]; then
+            echo 'Redis Cluster did not become ready' >&2
+            exit 1
+          fi
+          sleep 1
+        done
+
+volumes:
+  redis-data:
+  valkey-data:
+  postgres-data:
+  cluster-17000-data:
+  cluster-17001-data:
+  cluster-17002-data:
