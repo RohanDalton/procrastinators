@@ -60,6 +60,7 @@ dev = ["docs", "lint", "services", "test"]
 
 [tool.pixi.feature.build.dependencies]
 hatch = "*"
+twine = "*"
 
 [tool.pixi.feature.docs.dependencies]
 myst-parser = "*"

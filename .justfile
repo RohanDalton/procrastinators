@@ -1,4 +1,18 @@
+build := "pixi run -e build"
 run := "pixi run -e dev"
+
+
+[doc("Build the package")]
+build: clean
+    rm -rf dist
+    {{ build }} hatch build
+
+clean:
+    rm -rf dist build *.egg-info coverage .coverage docs/build
+
+[doc("Release package to PyPi")]
+release: build
+    {{ build }} twine upload dist/*
 
 [doc("Build the HTML documentation, failing on any warning")]
 docs *args="":
